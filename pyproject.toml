@@ -18,7 +18,7 @@ dependencies = [
 specrag = "specrag.cli:app"
 
 [dependency-groups]
-dev = ["pytest", "pytest-cov", "ruff", "mypy", "types-PyYAML"]
+dev = ["pytest", "pytest-cov", "ruff", "mypy", "types-PyYAML", "pre-commit"]
 
 [build-system]
 requires = ["hatchling"]

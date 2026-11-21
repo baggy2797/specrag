@@ -1,0 +1,78 @@
+name: Corpus
+
+on:
+  schedule:
+    - cron: "17 5 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      SPECRAG_CACHE: ${{ github.workspace }}/.corpus-cache
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
+        with:
+          python-version: "3.12"
+      - run: uv sync --locked
+      - name: Restore corpus cache (a hit refreshes eviction)
+        id: corpus-cache
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .corpus-cache
+          key: corpus-${{ hashFiles('corpus/manifest.yaml') }}
+      - name: Fetch and verify hashes (fresh directory, always hits upstream)
+        env:
+          SPECRAG_CACHE: ${{ runner.temp }}/fresh-corpus
+        run: |
+          for attempt in 1 2 3; do
+            rc=0
+            uv run specrag fetch || rc=$?
+            if [ "$rc" -eq 0 ]; then exit 0; fi
+            if [ "$rc" -ne 3 ]; then exit "$rc"; fi
+            echo "fetch attempt $attempt failed with exit 3"
+            sleep $((attempt * 20))
+          done
+          echo "::error title=Infrastructure failure::corpus unavailable: not caused by this change"
+          exit 3
+      - name: Stage fetched corpus for the cache
+        if: steps.corpus-cache.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p .corpus-cache
+          cp -a "${{ runner.temp }}/fresh-corpus/." .corpus-cache/
+      - name: Save corpus cache
+        if: steps.corpus-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .corpus-cache
+          key: corpus-${{ hashFiles('corpus/manifest.yaml') }}
+
+  report-failure:
+    needs: fetch
+    if: failure()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      issues: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    steps:
+      - name: Open or update the re-pin issue
+        run: |
+          existing=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open \
+            --search 'in:title "Corpus re-pin needed"' --json number --jq '.[0].number // empty')
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --repo "$GITHUB_REPOSITORY" \
+              --body "Corpus fetch failed again: $RUN_URL"
+          else
+            gh issue create --repo "$GITHUB_REPOSITORY" --title "Corpus re-pin needed" \
+              --body "The weekly corpus fetch failed or a pinned hash drifted. Run: $RUN_URL"
+          fi
