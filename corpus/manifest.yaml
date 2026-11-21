@@ -1,0 +1,168 @@
+docs:
+- doc_id: rfc6749
+  title: The OAuth 2.0 Authorization Framework
+  status: standards_track
+  url: https://www.rfc-editor.org/rfc/rfc6749.html
+  updates: []
+  obsoletes:
+  - rfc5849
+  sha256: 535362fa3b4ca668d4734c244c6ed8c811f2ccd7ea1612a4201e5d8922a74b4e
+- doc_id: rfc6750
+  title: 'The OAuth 2.0 Authorization Framework: Bearer Token Usage'
+  status: standards_track
+  url: https://www.rfc-editor.org/rfc/rfc6750.html
+  updates: []
+  obsoletes: []
+  sha256: c458bb43ff32efb811466120efdec411010cdde537e59948342240a32dcd5a1c
+- doc_id: rfc7636
+  title: Proof Key for Code Exchange by OAuth Public Clients
+  status: standards_track
+  url: https://www.rfc-editor.org/rfc/rfc7636.html
+  updates: []
+  obsoletes: []
+  sha256: 1dd39bd17081e0ed18c2cf304b87c79061c51e505d2ff5e12ffbd0d182fe5b20
+- doc_id: rfc7009
+  title: OAuth 2.0 Token Revocation
+  status: standards_track
+  url: https://www.rfc-editor.org/rfc/rfc7009.html
+  updates: []
+  obsoletes: []
+  sha256: af01723527d58beb02d56c236d4cec1e9b702da239e9a91920e9ecc839c01d8f
+- doc_id: rfc7662
+  title: OAuth 2.0 Token Introspection
+  status: standards_track
+  url: https://www.rfc-editor.org/rfc/rfc7662.html
+  updates: []
+  obsoletes: []
+  sha256: 8c36ce5246215c16fac436fafda277ee0638566b7610aa5cc6673388009445d7
+- doc_id: rfc8414
+  title: OAuth 2.0 Authorization Server Metadata
+  status: standards_track
+  url: https://www.rfc-editor.org/rfc/rfc8414.html
+  updates: []
+  obsoletes: []
+  sha256: 05083c732395b4499316f5d030f2f86cc203f9ac8a455af7efb3f27a29b57697
+- doc_id: rfc8252
+  title: OAuth 2.0 for Native Apps
+  status: bcp
+  url: https://www.rfc-editor.org/rfc/rfc8252.html
+  updates:
+  - rfc6749
+  obsoletes: []
+  sha256: fdda8f9e27f3bb4bb119742f4752df5bdfa9f8d9d3a6595ea0c3f581e13bfc79
+- doc_id: rfc8628
+  title: OAuth 2.0 Device Authorization Grant
+  status: standards_track
+  url: https://www.rfc-editor.org/rfc/rfc8628.html
+  updates: []
+  obsoletes: []
+  sha256: 4230ffd7f528dd641fd2579eee8acbb98da877867e9231998712f19dda1b349f
+- doc_id: rfc9126
+  title: OAuth 2.0 Pushed Authorization Requests
+  status: standards_track
+  url: https://www.rfc-editor.org/rfc/rfc9126.html
+  updates: []
+  obsoletes: []
+  sha256: 63ff5c59d0017c94165d3cc49786fd272edfe2666a4e96c2b65a623a0010b31c
+- doc_id: rfc9449
+  title: OAuth 2.0 Demonstrating Proof of Possession (DPoP)
+  status: standards_track
+  url: https://www.rfc-editor.org/rfc/rfc9449.html
+  updates: []
+  obsoletes: []
+  sha256: 2d8657f072913d55627dc25c02d3ad305bd62bed7f06c78c7d0621768b234784
+- doc_id: rfc8705
+  title: OAuth 2.0 Mutual-TLS Client Authentication and Certificate-Bound Access Tokens
+  status: standards_track
+  url: https://www.rfc-editor.org/rfc/rfc8705.html
+  updates: []
+  obsoletes: []
+  sha256: f9ca7c82d30fd90f1ab21bc16d561ae5e3da625e824cc73b97000ae829f2bdb9
+- doc_id: rfc9068
+  title: JSON Web Token (JWT) Profile for OAuth 2.0 Access Tokens
+  status: standards_track
+  url: https://www.rfc-editor.org/rfc/rfc9068.html
+  updates: []
+  obsoletes: []
+  sha256: 03f9f0f2090864299fa2779dd4129824859017165a0ae99f90669d7084a1712f
+- doc_id: rfc9700
+  title: Best Current Practice for OAuth 2.0 Security
+  status: bcp
+  url: https://www.rfc-editor.org/rfc/rfc9700.html
+  updates:
+  - rfc6749
+  - rfc6750
+  - rfc6819
+  obsoletes: []
+  sha256: c00e2234fcd79581bc29669c60d693afaa42f67d9205bddee848f757ae975419
+- doc_id: rfc7515
+  title: JSON Web Signature (JWS)
+  status: standards_track
+  url: https://www.rfc-editor.org/rfc/rfc7515.html
+  updates: []
+  obsoletes: []
+  sha256: 88fcf41b04710963f704f3dedb64425abacdd34308660f1d35688a2ac3ba0bd5
+- doc_id: rfc7516
+  title: JSON Web Encryption (JWE)
+  status: standards_track
+  url: https://www.rfc-editor.org/rfc/rfc7516.html
+  updates: []
+  obsoletes: []
+  sha256: 82e64c816e0c0be03ce3a0e81230e0d934f8c3feb738b1babe4c63d8d31a0a2c
+- doc_id: rfc7517
+  title: JSON Web Key (JWK)
+  status: standards_track
+  url: https://www.rfc-editor.org/rfc/rfc7517.html
+  updates: []
+  obsoletes: []
+  sha256: d0d5d43a2b55352c60da26cfbcffd12632ee1e45182347a67af9858fb37c3c01
+- doc_id: rfc7518
+  title: JSON Web Algorithms (JWA)
+  status: standards_track
+  url: https://www.rfc-editor.org/rfc/rfc7518.html
+  updates: []
+  obsoletes: []
+  sha256: 2fe340b744196a10cc9472ab8987c8cd972d10f2c597b7e292c6dedd00c2bf13
+- doc_id: rfc7519
+  title: JSON Web Token (JWT)
+  status: standards_track
+  url: https://www.rfc-editor.org/rfc/rfc7519.html
+  updates: []
+  obsoletes: []
+  sha256: d0ca0d6c6f8b7dfcad6e13c55086694d7ee69665bb828dcac6362d1587b4b53b
+- doc_id: rfc8725
+  title: JSON Web Token Best Current Practices
+  status: bcp
+  url: https://www.rfc-editor.org/rfc/rfc8725.html
+  updates:
+  - rfc7519
+  obsoletes: []
+  sha256: 7f93df8a106c14e2c9394bd3fc12a488266477c89a1fe2f9182cf0bdb02d7ce0
+- doc_id: oidc-core
+  title: OpenID Connect Core 1.0
+  status: openid_final
+  url: https://openid.net/specs/openid-connect-core-1_0.html
+  updates: []
+  obsoletes: []
+  sha256: 4d016752a645e8a3c259baa4173b5a90cb6c82898ce868fc8444adde262a5aed
+- doc_id: oidc-discovery
+  title: OpenID Connect Discovery 1.0
+  status: openid_final
+  url: https://openid.net/specs/openid-connect-discovery-1_0.html
+  updates: []
+  obsoletes: []
+  sha256: 0401a07b35de50e914e195aa2c3c64cc4f6542464381c885d24a2623fbf75ec2
+- doc_id: oidc-registration
+  title: OpenID Connect Dynamic Client Registration 1.0
+  status: openid_final
+  url: https://openid.net/specs/openid-connect-registration-1_0.html
+  updates: []
+  obsoletes: []
+  sha256: c151a4abab7704f2efa9b00530dcfeeefb3de6acbdbdf5ba05c9903f1de2a318
+- doc_id: oauth-2.1
+  title: The OAuth 2.1 Authorization Framework (draft-ietf-oauth-v2-1-17)
+  status: draft
+  url: https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-1-17
+  updates: []
+  obsoletes: []
+  sha256: 5fb16f81687cad019b595687e28351a1f8d8798f3b15fc3e143d409546217e5b
