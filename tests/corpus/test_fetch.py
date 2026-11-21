@@ -7,7 +7,7 @@ import yaml
 from typer.testing import CliRunner
 
 import specrag.cli as cli
-from specrag.corpus.fetch import FetchError, fetch_all
+from specrag.corpus.fetch import FetchError, fetch_all, normalize
 from specrag.corpus.manifest import ManifestEntry, load_manifest, raw_path
 from specrag.models import DocStatus
 
@@ -205,3 +205,69 @@ def test_download_size_cap() -> None:
 def test_load_manifest_cwd_independent(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.chdir(tmp_path)
     assert len(load_manifest()) == 23
+
+
+def _beacon(r: str) -> bytes:
+    return (
+        b"<script>(function(){function c(){var b=a.contentDocument"
+        b"window.__CF$cv$params={r:'" + r.encode() + b"',t:'MTc2'};"
+        b"}})();</script>"
+    )
+
+
+def _page(beacon: bytes, text: bytes = b"spec") -> bytes:
+    return b"<html><body>" + text + beacon + b"</body></html>"
+
+
+def test_normalize_strips_beacon_only() -> None:
+    assert normalize(_page(_beacon("abc"))) == b"<html><body>spec</body></html>"
+
+
+def test_normalize_strips_multiple_beacons() -> None:
+    data = b"<p>a</p>" + _beacon("x") + b"<p>b</p>" + _beacon("y") + b"<p>c</p>"
+    assert normalize(data) == b"<p>a</p><p>b</p><p>c</p>"
+
+
+def test_normalize_leaves_plain_page_identical() -> None:
+    assert normalize(BODY) == BODY
+
+
+def test_normalize_keeps_ordinary_script() -> None:
+    data = (
+        b"<html><script>var x = 1;</script>" + _beacon("q") + b"<script src='a.js'></script></html>"
+    )
+    assert (
+        normalize(data) == b"<html><script>var x = 1;</script><script src='a.js'></script></html>"
+    )
+
+
+def test_beacon_variants_pass_against_one_pin() -> None:
+    pin = hashlib.sha256(_page(b"")).hexdigest()
+    for r in ("aaa", "bbb"):
+        body = _page(_beacon(r))
+        c = client(httpx.MockTransport(lambda req, b=body: httpx.Response(200, content=b)))
+        fetch_all([entry(pin)], client=c)
+        assert raw_path("rfc1").read_bytes() == _page(b"")
+        raw_path("rfc1").unlink()
+
+
+def test_real_change_still_mismatches_with_beacon() -> None:
+    pin = hashlib.sha256(_page(b"")).hexdigest()
+    body = _page(_beacon("aaa"), text=b"changed")
+    c = client(httpx.MockTransport(lambda req: httpx.Response(200, content=body)))
+    with pytest.raises(FetchError, match="sha256 mismatch"):
+        fetch_all([entry(pin)], client=c)
+
+
+def test_cached_file_with_beacon_is_accepted_and_rewritten() -> None:
+    pin = hashlib.sha256(_page(b"")).hexdigest()
+    p = raw_path("rfc1")
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_bytes(_page(_beacon("old")))
+
+    def boom(r: httpx.Request) -> httpx.Response:
+        raise AssertionError("should not download")
+
+    report = fetch_all([entry(pin)], client=client(httpx.MockTransport(boom)))
+    assert report.skipped == ["rfc1"]
+    assert p.read_bytes() == _page(b"")

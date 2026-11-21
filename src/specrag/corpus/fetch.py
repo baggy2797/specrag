@@ -3,6 +3,7 @@
 import hashlib
 import json
 import os
+import re
 import tempfile
 import time
 from collections.abc import Callable, Sequence
@@ -14,6 +15,27 @@ from pydantic import BaseModel
 from specrag.corpus.manifest import ManifestEntry, corpus_cache_dir, raw_path, write_pins
 
 MAX_BYTES = 20 * 1024 * 1024
+
+
+_SCRIPT_BLOCK = re.compile(rb"<script[^>]*>.*?</script>", re.DOTALL | re.IGNORECASE)
+_CF_MARKER = b"__CF$cv$params"
+
+
+def normalize(data: bytes) -> bytes:
+    """Remove Cloudflare's injected challenge-platform beacon scripts.
+
+    Cloudflare inserts a per-request ``<script>`` block containing
+    ``window.__CF$cv$params={r:'<random>',t:'<ts>'}`` into some pages, so the
+    same document hashes differently on every fetch. Hashing and storing the
+    bytes with that block removed makes the pin stable. Only ``<script>``
+    blocks containing the ``__CF$cv$params`` marker are removed; every other
+    byte, including ordinary scripts, is left untouched.
+    """
+
+    def _drop(m: re.Match[bytes]) -> bytes:
+        return b"" if _CF_MARKER in m.group(0) else m.group(0)
+
+    return _SCRIPT_BLOCK.sub(_drop, data)
 
 
 class FetchError(Exception):
@@ -84,12 +106,16 @@ def fetch_all(
     for e in entries:
         path = raw_path(e.doc_id)
         if e.sha256 and path.exists():
-            cached = hashlib.sha256(path.read_bytes()).hexdigest()
+            raw = path.read_bytes()
+            clean = normalize(raw)
+            cached = hashlib.sha256(clean).hexdigest()
             if cached == e.sha256:
+                if clean != raw:
+                    _write_atomic(path, clean)
                 report.skipped.append(e.doc_id)
                 hashes[e.doc_id] = cached
                 continue
-        data = _download(e, client, retries, sleep)
+        data = normalize(_download(e, client, retries, sleep))
         digest = hashlib.sha256(data).hexdigest()
         if e.sha256 and digest != e.sha256:
             raise FetchError(e.doc_id, f"sha256 mismatch (expected {e.sha256}, got {digest})")
