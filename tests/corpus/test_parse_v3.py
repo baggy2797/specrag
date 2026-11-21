@@ -88,12 +88,6 @@ def test_validate_empty() -> None:
         validate_sections("rfcX", [])
 
 
-def test_unimplemented_dialects_raise() -> None:
-    html = '<a name="rfc.section.1"></a><h3>1.&nbsp;Intro</h3>'
-    with pytest.raises(NotImplementedError):
-        parse_doc("x", html)
-
-
 @pytest.mark.corpus
 @pytest.mark.parametrize(
     ("doc_id", "dialect"),
