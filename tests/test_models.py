@@ -29,14 +29,31 @@ def test_chunk_requires_parallel_sections_tokens() -> None:
             sections=["rfc6749#1"],
             tokens=[],
             n_tokens=1,
+            span=(0, 1),
         )
     with pytest.raises(ValidationError):
-        Chunk(id="c", doc_id="d", text="t", index_text="t", sections=[], tokens=[], n_tokens=0)
+        Chunk(
+            id="c",
+            doc_id="d",
+            text="t",
+            index_text="t",
+            sections=[],
+            tokens=[],
+            n_tokens=0,
+            span=(0, 1),
+        )
 
 
 def test_chunk_valid_and_frozen() -> None:
     c = Chunk(
-        id="c", doc_id="d", text="t", index_text="t", sections=["d#1"], tokens=[3], n_tokens=3
+        id="c",
+        doc_id="d",
+        text="t",
+        index_text="t",
+        sections=["d#1"],
+        tokens=[3],
+        n_tokens=3,
+        span=(0, 3),
     )
     with pytest.raises(ValidationError):
         c.text = "u"
@@ -61,3 +78,33 @@ def test_section_index_ancestors_and_lookup() -> None:
 def test_section_index_duplicate_raises() -> None:
     with pytest.raises(ValueError, match="rfc6749#4"):
         SectionIndex([_sec("4"), _sec("4")])
+
+
+def _chunk(**kw: object) -> Chunk:
+    base: dict[str, object] = dict(
+        id="c",
+        doc_id="d",
+        text="t",
+        index_text="t",
+        sections=["d#1"],
+        tokens=[3],
+        n_tokens=3,
+        span=(0, 3),
+    )
+    base.update(kw)
+    return Chunk(**base)  # type: ignore[arg-type]
+
+
+def test_chunk_span_validator() -> None:
+    assert _chunk().prefix_tokens == 0
+    assert _chunk(prefix_tokens=4, n_tokens=7).n_tokens == 7
+    for bad in (
+        {"n_tokens": 4},  # n_tokens != prefix + span length
+        {"prefix_tokens": 2},  # prefix not reflected in n_tokens
+        {"span": (3, 0), "n_tokens": 3},  # reversed
+        {"span": (2, 2), "n_tokens": 0, "tokens": [0]},  # empty
+        {"span": (-1, 2), "n_tokens": 3},  # negative start
+        {"tokens": [4]},  # sum(tokens) > span length
+    ):
+        with pytest.raises(ValidationError):
+            _chunk(**bad)
