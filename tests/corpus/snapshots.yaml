@@ -1,0 +1,253 @@
+rfc6749:
+  n_sections: 119
+  first_id: rfc6749#1
+  last_id: rfc6749#C
+  samples:
+  - id: rfc6749#1
+    title: Introduction
+  - id: rfc6749#7.2
+    title: Error Response
+  - id: rfc6749#C
+    title: Acknowledgements
+rfc6750:
+  n_sections: 26
+  first_id: rfc6750#1
+  last_id: rfc6750#A
+  samples:
+  - id: rfc6750#1
+    title: Introduction
+  - id: rfc6750#5.2
+    title: Threat Mitigation
+  - id: rfc6750#A
+    title: Acknowledgements
+rfc7636:
+  n_sections: 30
+  first_id: rfc7636#1
+  last_id: rfc7636#B
+  samples:
+  - id: rfc7636#1
+    title: Introduction
+  - id: rfc7636#6.1
+    title: OAuth Parameters Registry
+  - id: rfc7636#B
+    title: Example for the S256 code_challenge_method
+rfc7009:
+  n_sections: 19
+  first_id: rfc7009#1
+  last_id: rfc7009#7.2
+  samples:
+  - id: rfc7009#1
+    title: Introduction
+  - id: rfc7009#4.1
+    title: OAuth Extensions Error Registration
+  - id: rfc7009#7.2
+    title: Informative References
+rfc7662:
+  n_sections: 17
+  first_id: rfc7662#1
+  last_id: rfc7662#A
+  samples:
+  - id: rfc7662#1
+    title: Introduction
+  - id: rfc7662#3.1
+    title: OAuth Token Introspection Response Registry
+  - id: rfc7662#A
+    title: Use with Proof-of-Possession Tokens
+rfc8414:
+  n_sections: 26
+  first_id: rfc8414#1
+  last_id: rfc8414#8.2
+  samples:
+  - id: rfc8414#1
+    title: Introduction
+  - id: rfc8414#6.2
+    title: Impersonation Attacks
+  - id: rfc8414#8.2
+    title: Informative References
+rfc8252:
+  n_sections: 35
+  first_id: rfc8252#1
+  last_id: rfc8252#B.5
+  samples:
+  - id: rfc8252#1
+    title: Introduction
+  - id: rfc8252#8.6
+    title: Client Impersonation
+  - id: rfc8252#B.5
+    title: Linux Implementation Details
+rfc8628:
+  n_sections: 27
+  first_id: rfc8628#1
+  last_id: rfc8628#8
+  samples:
+  - id: rfc8628#1
+    title: Introduction
+  - id: rfc8628#5.3
+    title: Device Trustworthiness
+  - id: rfc8628#8
+    title: Normative References
+rfc9126:
+  n_sections: 26
+  first_id: rfc9126#1
+  last_id: rfc9126#10.2
+  samples:
+  - id: rfc9126#1
+    title: Introduction
+  - id: rfc9126#7.1
+    title: Request URI Guessing
+  - id: rfc9126#10.2
+    title: Informative References
+rfc9449:
+  n_sections: 51
+  first_id: rfc9449#1
+  last_id: rfc9449#13.2
+  samples:
+  - id: rfc9449#1
+    title: Introduction
+  - id: rfc9449#11.1
+    title: DPoP Proof Replay
+  - id: rfc9449#13.2
+    title: Informative References
+rfc8705:
+  n_sections: 39
+  first_id: rfc8705#1
+  last_id: rfc8705#10.2
+  samples:
+  - id: rfc8705#1
+    title: Introduction
+  - id: rfc8705#6.2
+    title: Resource Server
+  - id: rfc8705#10.2
+    title: Informative References
+rfc9068:
+  n_sections: 25
+  first_id: rfc9068#1
+  last_id: rfc9068#8.2
+  samples:
+  - id: rfc9068#1
+    title: Introduction
+  - id: rfc9068#5
+    title: Security Considerations
+  - id: rfc9068#8.2
+    title: Informative References
+rfc9700:
+  n_sections: 78
+  first_id: rfc9700#1
+  last_id: rfc9700#7.2
+  samples:
+  - id: rfc9700#1
+    title: Introduction
+  - id: rfc9700#4.5.3.3
+    title: Other Solutions
+  - id: rfc9700#7.2
+    title: Informative References
+rfc7515:
+  n_sections: 81
+  first_id: rfc7515#1
+  last_id: rfc7515#F
+  samples:
+  - id: rfc7515#1
+    title: Introduction
+  - id: rfc7515#10.1
+    title: Key Entropy and Random Values
+  - id: rfc7515#F
+    title: Detached Content
+rfc7516:
+  n_sections: 93
+  first_id: rfc7516#1
+  last_id: rfc7516#B.7
+  samples:
+  - id: rfc7516#1
+    title: Introduction
+  - id: rfc7516#12.1
+    title: Normative References
+  - id: rfc7516#B.7
+    title: Truncate HMAC Value to Create Authentication Tag
+rfc7517:
+  n_sections: 56
+  first_id: rfc7517#1
+  last_id: rfc7517#C.9
+  samples:
+  - id: rfc7517#1
+    title: Introduction
+  - id: rfc7517#8.4
+    title: JSON Web Key Set Parameters Registry
+  - id: rfc7517#C.9
+    title: Complete Representation
+rfc7518:
+  n_sections: 113
+  first_id: rfc7518#1
+  last_id: rfc7518#C
+  samples:
+  - id: rfc7518#1
+    title: Introduction
+  - id: rfc7518#6.3.2.1
+    title: '"d" (Private Exponent) Parameter'
+  - id: rfc7518#C
+    title: Example ECDH-ES Key Agreement Computation
+rfc7519:
+  n_sections: 50
+  first_id: rfc7519#1
+  last_id: rfc7519#C
+  samples:
+  - id: rfc7519#1
+    title: Introduction
+  - id: rfc7519#7.3
+    title: String Comparison Rules
+  - id: rfc7519#C
+    title: Relationship of JWTs to Simple Web Tokens (SWTs)
+rfc8725:
+  n_sections: 31
+  first_id: rfc8725#1
+  last_id: rfc8725#6.2
+  samples:
+  - id: rfc8725#1
+    title: Introduction
+  - id: rfc8725#3.2
+    title: Use Appropriate Algorithms
+  - id: rfc8725#6.2
+    title: Informative References
+oidc-core:
+  n_sections: 183
+  first_id: oidc-core#1
+  last_id: oidc-core#C
+  samples:
+  - id: oidc-core#1
+    title: Introduction
+  - id: oidc-core#6.2.2
+    title: Request using the "request_uri" Request Parameter
+  - id: oidc-core#C
+    title: Notices
+oidc-discovery:
+  n_sections: 31
+  first_id: oidc-discovery#1
+  last_id: oidc-discovery#B
+  samples:
+  - id: oidc-discovery#1
+    title: Introduction
+  - id: oidc-discovery#4.2
+    title: OpenID Provider Configuration Response
+  - id: oidc-discovery#B
+    title: Notices
+oidc-registration:
+  n_sections: 32
+  first_id: oidc-registration#1
+  last_id: oidc-registration#B
+  samples:
+  - id: oidc-registration#1
+    title: Introduction
+  - id: oidc-registration#7
+    title: Validation
+  - id: oidc-registration#B
+    title: Notices
+oauth-2.1:
+  n_sections: 172
+  first_id: oauth-2.1#1
+  last_id: oauth-2.1#F
+  samples:
+  - id: oauth-2.1#1
+    title: Introduction
+  - id: oauth-2.1#7.3.1
+    title: Impersonation of Native Apps
+  - id: oauth-2.1#F
+    title: Document History
