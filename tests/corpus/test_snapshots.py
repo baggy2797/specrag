@@ -1,3 +1,4 @@
+import hashlib
 from pathlib import Path
 
 import pytest
@@ -18,6 +19,10 @@ def test_snapshot(doc_id: str) -> None:
     assert len(secs) == snap["n_sections"]
     assert secs[0].id == snap["first_id"]
     assert secs[-1].id == snap["last_id"]
+    assert sum(s.own_tokens for s in secs) == snap["own_tokens_total"]
+    ids_sha = hashlib.sha256("\n".join(s.id for s in secs).encode()).hexdigest()
+    assert ids_sha == snap["ids_sha256"]
+    assert sum(s.kind == "references" for s in secs) == snap["n_references"]
     titles = {s.id: s.title for s in secs}
     for sample in snap["samples"]:
         assert titles[sample["id"]] == sample["title"]

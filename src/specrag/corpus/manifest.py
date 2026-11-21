@@ -9,7 +9,8 @@ from pydantic import field_validator
 
 from specrag.models import Doc
 
-DEFAULT_MANIFEST = Path("corpus/manifest.yaml")
+# src/specrag/corpus/manifest.py -> parents[3] is the repo root.
+DEFAULT_MANIFEST = Path(__file__).resolve().parents[3] / "corpus" / "manifest.yaml"
 _DOC_ID_RE = re.compile(r"[a-z0-9][a-z0-9.-]*")
 
 

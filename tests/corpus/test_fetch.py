@@ -163,7 +163,7 @@ def test_unsafe_doc_id_rejected(tmp_path: Path) -> None:
 
 
 def test_manifest_has_23_unique_docs() -> None:
-    entries = load_manifest(Path(__file__).parents[2] / "corpus" / "manifest.yaml")
+    entries = load_manifest()
     ids = [e.doc_id for e in entries]
     assert len(ids) == 23 and len(set(ids)) == 23
     by = {e.doc_id: e for e in entries}
@@ -192,3 +192,16 @@ def test_cli_drift_exit_code_and_message(tmp_path: Path, monkeypatch: pytest.Mon
     r = CliRunner().invoke(cli.app, ["fetch", "--manifest", str(m)])
     assert r.exit_code == 3
     assert "corpus unavailable: not caused by this change — rfc1: sha256 mismatch" in r.stderr
+
+
+def test_download_size_cap() -> None:
+    big = b"x" * (20 * 1024 * 1024 + 1)
+    c = client(httpx.MockTransport(lambda r: httpx.Response(200, content=big)))
+    with pytest.raises(FetchError, match="rfc1: response exceeds 20 MB"):
+        fetch_all([entry(None)], client=c)
+    assert not raw_path("rfc1").exists()
+
+
+def test_load_manifest_cwd_independent(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.chdir(tmp_path)
+    assert len(load_manifest()) == 23

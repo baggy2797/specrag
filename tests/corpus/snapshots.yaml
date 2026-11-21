@@ -9,6 +9,9 @@ rfc6749:
     title: Error Response
   - id: rfc6749#C
     title: Acknowledgements
+  own_tokens_total: 24239
+  ids_sha256: 4d26d5d011c3539a492181d8c45364231d8587bcac78f0564adbefa8eb4edff8
+  n_references: 3
 rfc6750:
   n_sections: 26
   first_id: rfc6750#1
@@ -20,6 +23,9 @@ rfc6750:
     title: Threat Mitigation
   - id: rfc6750#A
     title: Acknowledgements
+  own_tokens_total: 6029
+  ids_sha256: 3bccb197987140044ce595f746c2f6bf7ca510549a02c4e48bf0af87bf349fdd
+  n_references: 3
 rfc7636:
   n_sections: 30
   first_id: rfc7636#1
@@ -31,6 +37,9 @@ rfc7636:
     title: OAuth Parameters Registry
   - id: rfc7636#B
     title: Example for the S256 code_challenge_method
+  own_tokens_total: 6028
+  ids_sha256: 43383fbfca464a37bf4368a713109c70a866cdb2127ae31175f0564b26bbbb00
+  n_references: 3
 rfc7009:
   n_sections: 19
   first_id: rfc7009#1
@@ -42,6 +51,9 @@ rfc7009:
     title: OAuth Extensions Error Registration
   - id: rfc7009#7.2
     title: Informative References
+  own_tokens_total: 3255
+  ids_sha256: 06f0fb4fc63bb0c17f91850fe014b1c59919c0966050366a3e79d66810b9c539
+  n_references: 3
 rfc7662:
   n_sections: 17
   first_id: rfc7662#1
@@ -53,6 +65,9 @@ rfc7662:
     title: OAuth Token Introspection Response Registry
   - id: rfc7662#A
     title: Use with Proof-of-Possession Tokens
+  own_tokens_total: 5844
+  ids_sha256: 304d1b4535bf0331fa13736120e9be7b166bc22393ddd775691f70964a56e283
+  n_references: 3
 rfc8414:
   n_sections: 26
   first_id: rfc8414#1
@@ -64,6 +79,9 @@ rfc8414:
     title: Impersonation Attacks
   - id: rfc8414#8.2
     title: Informative References
+  own_tokens_total: 8778
+  ids_sha256: 32faea7ecf486526de00f1add80beecc413ceb78e58f35f1c491f73bc3a045f0
+  n_references: 3
 rfc8252:
   n_sections: 35
   first_id: rfc8252#1
@@ -75,6 +93,9 @@ rfc8252:
     title: Client Impersonation
   - id: rfc8252#B.5
     title: Linux Implementation Details
+  own_tokens_total: 7589
+  ids_sha256: 423546216f5fb0e62c232d6443936771c5874b8f5709d3f71be582d22fc2eacf
+  n_references: 3
 rfc8628:
   n_sections: 27
   first_id: rfc8628#1
@@ -86,6 +107,9 @@ rfc8628:
     title: Device Trustworthiness
   - id: rfc8628#8
     title: Normative References
+  own_tokens_total: 7056
+  ids_sha256: 2faaa1f3b189adb04be6161328f4183ae6e0ad962a2190dfdf4db4788d610bb3
+  n_references: 1
 rfc9126:
   n_sections: 26
   first_id: rfc9126#1
@@ -97,6 +121,9 @@ rfc9126:
     title: Request URI Guessing
   - id: rfc9126#10.2
     title: Informative References
+  own_tokens_total: 9470
+  ids_sha256: 0c67312109a0212a6ce86096716dc8a0f40c7c6d3b890b7a8dee0bc6d6a7a174
+  n_references: 3
 rfc9449:
   n_sections: 51
   first_id: rfc9449#1
@@ -108,6 +135,9 @@ rfc9449:
     title: DPoP Proof Replay
   - id: rfc9449#13.2
     title: Informative References
+  own_tokens_total: 19055
+  ids_sha256: c55eeb6562c0d6f5618c43b48cddfc842106adfe6050acabe50519112a9b5ab4
+  n_references: 3
 rfc8705:
   n_sections: 39
   first_id: rfc8705#1
@@ -119,6 +149,9 @@ rfc8705:
     title: Resource Server
   - id: rfc8705#10.2
     title: Informative References
+  own_tokens_total: 9319
+  ids_sha256: 3ccb6412be40f1977811084fb8d2019e0e09dbb1e30179b699d6f7963a372e9c
+  n_references: 3
 rfc9068:
   n_sections: 25
   first_id: rfc9068#1
@@ -130,6 +163,9 @@ rfc9068:
     title: Security Considerations
   - id: rfc9068#8.2
     title: Informative References
+  own_tokens_total: 6029
+  ids_sha256: 2b437b8ebeea1d84e1d552071189f88e85e69908d4038882736b0dfc6073833d
+  n_references: 3
 rfc9700:
   n_sections: 78
   first_id: rfc9700#1
@@ -141,6 +177,9 @@ rfc9700:
     title: Other Solutions
   - id: rfc9700#7.2
     title: Informative References
+  own_tokens_total: 22147
+  ids_sha256: 4c677deb0e5aad01621e7b980685d18aec6b020f0b86871c078a6c73ad794db4
+  n_references: 3
 rfc7515:
   n_sections: 81
   first_id: rfc7515#1
@@ -152,6 +191,9 @@ rfc7515:
     title: Key Entropy and Random Values
   - id: rfc7515#F
     title: Detached Content
+  own_tokens_total: 29165
+  ids_sha256: d576db142dbc1db36828e0bb62e9895644390378c9e84cebc93c3f3e5c5edb97
+  n_references: 3
 rfc7516:
   n_sections: 93
   first_id: rfc7516#1
@@ -163,6 +205,9 @@ rfc7516:
     title: Normative References
   - id: rfc7516#B.7
     title: Truncate HMAC Value to Create Authentication Tag
+  own_tokens_total: 24012
+  ids_sha256: b601a736b153a7ec32385a58c4143b6d740e2ba8a5684e2becf9e1b020380dac
+  n_references: 3
 rfc7517:
   n_sections: 56
   first_id: rfc7517#1
@@ -174,6 +219,9 @@ rfc7517:
     title: JSON Web Key Set Parameters Registry
   - id: rfc7517#C.9
     title: Complete Representation
+  own_tokens_total: 29299
+  ids_sha256: 9396520a73396d07fb109444d3ed0de526e695c2d6e605356082f9a91260abdf
+  n_references: 3
 rfc7518:
   n_sections: 113
   first_id: rfc7518#1
@@ -185,6 +233,9 @@ rfc7518:
     title: '"d" (Private Exponent) Parameter'
   - id: rfc7518#C
     title: Example ECDH-ES Key Agreement Computation
+  own_tokens_total: 30213
+  ids_sha256: 8c93eef81818ef5463cfca2a9d331602d508367059691561373579d445449a3b
+  n_references: 3
 rfc7519:
   n_sections: 50
   first_id: rfc7519#1
@@ -196,6 +247,9 @@ rfc7519:
     title: String Comparison Rules
   - id: rfc7519#C
     title: Relationship of JWTs to Simple Web Tokens (SWTs)
+  own_tokens_total: 11912
+  ids_sha256: d07450a20a86ba01dce131bbd0157ed148da68067cb968cdd247be098f40be3f
+  n_references: 3
 rfc8725:
   n_sections: 31
   first_id: rfc8725#1
@@ -207,8 +261,11 @@ rfc8725:
     title: Use Appropriate Algorithms
   - id: rfc8725#6.2
     title: Informative References
+  own_tokens_total: 5411
+  ids_sha256: c30f840a9bdb40d73bc514e9f591d8da624ea811d27fb1d9d39c220f2ba9ffbe
+  n_references: 3
 oidc-core:
-  n_sections: 183
+  n_sections: 185
   first_id: oidc-core#1
   last_id: oidc-core#C
   samples:
@@ -218,8 +275,11 @@ oidc-core:
     title: Request using the "request_uri" Request Parameter
   - id: oidc-core#C
     title: Notices
+  own_tokens_total: 57127
+  ids_sha256: 63cc0c4acd6a7c5459f0fcd6f2afc7df93fabd6e1dc165a49d8df33f55c7bea1
+  n_references: 3
 oidc-discovery:
-  n_sections: 31
+  n_sections: 33
   first_id: oidc-discovery#1
   last_id: oidc-discovery#B
   samples:
@@ -229,8 +289,11 @@ oidc-discovery:
     title: OpenID Provider Configuration Response
   - id: oidc-discovery#B
     title: Notices
+  own_tokens_total: 12873
+  ids_sha256: 37e6eaf1491c1400a1616967a1149b4e1cd2ea32c272879dde188a8777788964
+  n_references: 3
 oidc-registration:
-  n_sections: 32
+  n_sections: 34
   first_id: oidc-registration#1
   last_id: oidc-registration#B
   samples:
@@ -240,6 +303,9 @@ oidc-registration:
     title: Validation
   - id: oidc-registration#B
     title: Notices
+  own_tokens_total: 13544
+  ids_sha256: 0b8449ceef4e5e9f4129a08a2cf24474fe27040e2f24ed1fbb2cc78ae4c6085d
+  n_references: 3
 oauth-2.1:
   n_sections: 172
   first_id: oauth-2.1#1
@@ -251,3 +317,6 @@ oauth-2.1:
     title: Impersonation of Native Apps
   - id: oauth-2.1#F
     title: Document History
+  own_tokens_total: 40390
+  ids_sha256: 653bd7c6c9b1c8c31267defffd89e0c13b270aa1fca336a246c87d7c0d214562
+  n_references: 3

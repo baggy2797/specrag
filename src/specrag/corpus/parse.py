@@ -36,7 +36,7 @@ class Dialect(StrEnum):
     OPENID_V2 = "openid_v2"
 
 
-_V3_RE = re.compile(r"<section\b[^>]*\bid=\"section-\d")
+_V3_RE = re.compile(r"<section\b[^>]*\sid=\"section-\d")
 _OPENID_RE = re.compile(r"<a\b[^>]*\bname=\"rfc\.section\.")
 
 
@@ -66,18 +66,46 @@ def validate_sections(doc_id: str, sections: list[Section]) -> None:
             raise ParseError(f"{doc_id}: section {s.id} has missing parent {p}")
 
 
+_REFS_TITLE = re.compile(r"^(normative |informative )?references$", re.IGNORECASE)
+
+
+def is_references_title(title: str) -> bool:
+    return _REFS_TITLE.match(title.strip()) is not None
+
+
+def flag_references(sections: list[Section]) -> list[Section]:
+    """Set ``kind="references"`` on References sections and all their descendants.
+
+    Parsers only flag; whether references are indexed is decided downstream (Plan 2).
+    """
+    roots = {s.id for s in sections if is_references_title(s.title)}
+    out: list[Section] = []
+    for s in sections:
+        p: str | None = s.id
+        hit = False
+        while p is not None:
+            if p in roots:
+                hit = True
+                break
+            p = parent(p)
+        out.append(s.model_copy(update={"kind": "references"}) if hit else s)
+    return out
+
+
 def _parser_for(dialect: Dialect) -> Callable[[str, BeautifulSoup], list[Section]]:
-    if dialect == Dialect.RFC_V3:
-        from specrag.corpus.parse_v3 import parse_v3
-
-        return parse_v3
-    if dialect == Dialect.RFC_HTMLIZED:
-        from specrag.corpus.parse_htmlized import parse_htmlized
-
-        return parse_htmlized
+    from specrag.corpus.parse_htmlized import parse_htmlized
     from specrag.corpus.parse_openid import parse_openid
+    from specrag.corpus.parse_v3 import parse_v3
 
-    return parse_openid
+    parsers: dict[Dialect, Callable[[str, BeautifulSoup], list[Section]]] = {
+        Dialect.RFC_V3: parse_v3,
+        Dialect.RFC_HTMLIZED: parse_htmlized,
+        Dialect.OPENID_V2: parse_openid,
+    }
+    try:
+        return parsers[dialect]
+    except KeyError:
+        raise ParseError(f"no parser for dialect {dialect!r}") from None
 
 
 def parse_doc(doc_id: str, html: str) -> list[Section]:
