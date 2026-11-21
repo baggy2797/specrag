@@ -1,8 +1,9 @@
 name: CI
 
 on:
-  push:
   pull_request:
+  push:
+    branches: [main]
 
 permissions:
   contents: read
@@ -33,3 +34,60 @@ jobs:
       - run: uv run ruff format --check .
       - run: uv run mypy src
       - run: uv run pytest -q
+
+  corpus-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      TIKTOKEN_CACHE_DIR: ${{ github.workspace }}/.tiktoken-cache
+      SPECRAG_CACHE: ${{ github.workspace }}/.corpus-cache
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
+        with:
+          python-version: "3.12"
+      - run: uv sync --locked --group dev
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .tiktoken-cache
+          key: tiktoken-cl100k-${{ hashFiles('uv.lock') }}
+      - name: Restore corpus cache (saved after the job on a miss)
+        id: corpus-cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .corpus-cache
+          key: corpus-${{ hashFiles('corpus/manifest.yaml') }}
+      - name: Fetch corpus (cache miss only, with retry)
+        if: steps.corpus-cache.outputs.cache-hit != 'true'
+        run: |
+          for attempt in 1 2 3; do
+            rc=0
+            uv run specrag fetch || rc=$?
+            if [ "$rc" -eq 0 ]; then exit 0; fi
+            if [ "$rc" -ne 3 ]; then exit "$rc"; fi
+            echo "fetch attempt $attempt failed with exit 3"
+            sleep $((attempt * 20))
+          done
+          echo "::error title=Infrastructure failure, not a test failure::corpus unavailable: not caused by this change"
+          echo "corpus unavailable: not caused by this change (infrastructure failure, not a test failure)" >> "$GITHUB_STEP_SUMMARY"
+          exit 3
+      - name: Tests with coverage (no corpus skips allowed)
+        run: |
+          set -o pipefail
+          uv run pytest -rs --cov=specrag --cov-report=term-missing --cov-fail-under=90 | tee pytest.log
+          if grep -q "corpus cache not available" pytest.log; then
+            echo "::error::corpus tests were skipped; the corpus cache must be present"
+            exit 1
+          fi
+
+  actionlint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Run actionlint
+        run: go run github.com/rhysd/actionlint/cmd/actionlint@914e7df21a07ef503a81201c76d2b11c789d3fca # v1.7.12
