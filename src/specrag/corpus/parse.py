@@ -75,7 +75,9 @@ def _parser_for(dialect: Dialect) -> Callable[[str, BeautifulSoup], list[Section
         from specrag.corpus.parse_htmlized import parse_htmlized
 
         return parse_htmlized
-    raise NotImplementedError(f"no parser implemented yet for dialect {dialect.value}")
+    from specrag.corpus.parse_openid import parse_openid
+
+    return parse_openid
 
 
 def parse_doc(doc_id: str, html: str) -> list[Section]:
