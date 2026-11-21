@@ -13,6 +13,8 @@ from pydantic import BaseModel
 
 from specrag.corpus.manifest import ManifestEntry, corpus_cache_dir, raw_path, write_pins
 
+MAX_BYTES = 20 * 1024 * 1024
+
 
 class FetchError(Exception):
     def __init__(self, doc_id: str, reason: str) -> None:
@@ -38,16 +40,21 @@ def _download(
         if attempt:
             sleep(float(2 ** (attempt - 1)))
         try:
-            resp = client.get(entry.url, follow_redirects=True)
+            with client.stream("GET", entry.url, follow_redirects=True) as resp:
+                if resp.status_code >= 500:
+                    reason = f"HTTP {resp.status_code}"
+                    continue
+                if resp.status_code >= 400:
+                    raise FetchError(entry.doc_id, f"HTTP {resp.status_code}")
+                buf = bytearray()
+                for chunk in resp.iter_bytes():
+                    buf.extend(chunk)
+                    if len(buf) > MAX_BYTES:
+                        raise FetchError(entry.doc_id, "response exceeds 20 MB")
+                return bytes(buf)
         except httpx.TransportError as e:
             reason = f"network error: {e}"
             continue
-        if resp.status_code >= 500:
-            reason = f"HTTP {resp.status_code}"
-            continue
-        if resp.status_code >= 400:
-            raise FetchError(entry.doc_id, f"HTTP {resp.status_code}")
-        return resp.content
     raise FetchError(entry.doc_id, reason)
 
 

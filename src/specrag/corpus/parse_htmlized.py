@@ -10,6 +10,7 @@ import re
 
 from bs4 import BeautifulSoup, Tag
 
+from specrag.corpus.parse import flag_references
 from specrag.models import Section
 from specrag.sections import make_id, parent
 from specrag.tokens import count_tokens
@@ -95,4 +96,4 @@ def parse_htmlized(doc_id: str, soup: BeautifulSoup) -> list[Section]:
                 own_tokens=count_tokens(own),
             )
         )
-    return out
+    return flag_references(out)

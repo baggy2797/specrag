@@ -1,7 +1,7 @@
 """Core frozen data models."""
 
 from enum import StrEnum
-from typing import Self
+from typing import Literal, Self
 
 from pydantic import BaseModel, ConfigDict, model_validator
 
@@ -38,6 +38,7 @@ class Section(BaseModel):
     depth: int
     own_text: str
     own_tokens: int
+    kind: Literal["content", "references"] = "content"
 
 
 class Chunk(BaseModel):
@@ -79,7 +80,10 @@ class SectionIndex:
         return id in self._by_id
 
     def ancestors(self, id: str) -> list[str]:
-        """Ancestor IDs, nearest first, derived from the ID structure."""
+        """Ancestor IDs, nearest first, derived from the ID (not looked up in the index).
+
+        ``validate_sections`` guarantees every parsed section's parents exist.
+        """
         out: list[str] = []
         p = parent(id)
         while p is not None:

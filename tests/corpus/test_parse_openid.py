@@ -52,7 +52,7 @@ def test_front_matter_toc_and_trailer_excluded(secs: dict[str, Section]) -> None
     assert secs["d#A.1"].own_text == "Last text."
 
 
-EXPECTED = {"oidc-core": (183, "C"), "oidc-discovery": (31, "B"), "oidc-registration": (32, "B")}
+EXPECTED = {"oidc-core": (185, "C"), "oidc-discovery": (33, "B"), "oidc-registration": (34, "B")}
 
 
 @pytest.mark.corpus
@@ -77,3 +77,16 @@ def test_corpus_core_details() -> None:
     }
     assert out["oidc-core#3.1.2.1"].title == "Authentication Request"
     assert out["oidc-core#3.1.2.1"].parent_id == "oidc-core#3.1.2"
+
+
+@pytest.mark.corpus
+@pytest.mark.parametrize(
+    "doc_id,n", [("oidc-core", 19), ("oidc-discovery", 9), ("oidc-registration", 11)]
+)
+def test_corpus_reference_sections(doc_id: str, n: int) -> None:
+    out = {s.id: s for s in parse_doc(doc_id, raw_path(doc_id).read_text(encoding="utf-8"))}
+    for sub, title in (("1", "Normative References"), ("2", "Informative References")):
+        s = out[f"{doc_id}#{n}.{sub}"]
+        assert s.title == title and s.kind == "references" and s.own_tokens > 50
+        assert s.parent_id == f"{doc_id}#{n}"
+    assert out[f"{doc_id}#{n}"].kind == "references"

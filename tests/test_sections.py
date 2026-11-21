@@ -1,3 +1,5 @@
+import pytest
+
 from specrag.sections import is_descendant, make_id, parent, split_id
 
 
@@ -17,3 +19,15 @@ def test_is_descendant_is_strict_and_component_wise() -> None:
 def test_roundtrip() -> None:
     assert split_id(make_id("oidc-core", "3.1.2.1")) == ("oidc-core", "3.1.2.1")
     assert split_id("oauth-2.1#A.1") == ("oauth-2.1", "A.1")
+
+
+@pytest.mark.parametrize("bad", ["", "rfc1", "#1", "rfc1#"])
+def test_split_id_rejects_malformed(bad: str) -> None:
+    with pytest.raises(ValueError):
+        split_id(bad)
+
+
+def test_parent_and_descendant_edges() -> None:
+    assert parent("oauth-2.1#4.1") == "oauth-2.1#4"
+    assert is_descendant("rfc7518#A.1", "rfc7518#A")
+    assert parent("rfc6749#4.10.2") == "rfc6749#4.10"

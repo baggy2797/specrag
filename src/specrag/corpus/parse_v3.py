@@ -5,6 +5,7 @@ import re
 
 from bs4 import BeautifulSoup, Tag
 
+from specrag.corpus.parse import flag_references
 from specrag.models import Section
 from specrag.sections import make_id, parent
 from specrag.tokens import count_tokens
@@ -66,4 +67,4 @@ def parse_v3(doc_id: str, soup: BeautifulSoup) -> list[Section]:
                 own_tokens=count_tokens(text),
             )
         )
-    return out
+    return flag_references(out)
