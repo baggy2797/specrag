@@ -5,6 +5,7 @@ import re
 
 from bs4 import BeautifulSoup, Tag
 
+from specrag.corpus.layout import collapse, html_units, join_units
 from specrag.corpus.parse import flag_references
 from specrag.models import Section
 from specrag.sections import make_id, parent
@@ -12,7 +13,6 @@ from specrag.tokens import count_tokens
 
 _ID_RE = re.compile(r"^(?:section-\d|appendix-[A-Z])")
 _HEADING_TAGS = ["h1", "h2", "h3", "h4", "h5", "h6"]
-_BLOCK_TAGS = ["p", "li", "pre", "div", "dt", "dd", "tr", "td", "th", "br", "table", "ul", "ol"]
 _WS = re.compile(r"\s+")
 
 
@@ -31,9 +31,7 @@ def _own_text(section: Tag) -> str:
         h.decompose()
     for a in clone.select("a.pilcrow"):
         a.decompose()
-    for b in clone.find_all(_BLOCK_TAGS):
-        b.insert_after(" ")
-    return _WS.sub(" ", clone.get_text("")).strip()
+    return join_units(html_units(clone))
 
 
 def parse_v3(doc_id: str, soup: BeautifulSoup) -> list[Section]:
@@ -52,7 +50,7 @@ def parse_v3(doc_id: str, soup: BeautifulSoup) -> list[Section]:
         number = _normalise_number(num_a.get_text())
         if not number:
             continue
-        title = _WS.sub(" ", name_a.get_text()).strip()
+        title = collapse(name_a.get_text())
         text = _own_text(sec)
         full_id = make_id(doc_id, number)
         out.append(

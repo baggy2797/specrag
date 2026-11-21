@@ -67,7 +67,7 @@ def test_own_text_excludes_children(html: str) -> None:
     two = secs["rfcX#2"]
     assert "Delta" not in two.own_text
     assert two.own_tokens < 50
-    assert "item one item two" in secs["rfcX#2.1"].own_text
+    assert "- item one\n\n- item two" in secs["rfcX#2.1"].own_text
     assert secs["rfcX#2.1"].own_tokens > 0
 
 

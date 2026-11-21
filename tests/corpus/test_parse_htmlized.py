@@ -126,7 +126,9 @@ def test_corpus_parses(doc_id: str) -> None:
     assert len(out) > 5
     for s in out:
         assert re.search(r"\[Page \d+\]", s.own_text) is None, s.id
-        assert _header_leak(doc_id).search(s.own_text) is None, s.id
+        # own_text is multi-line now; search the collapsed form so a header split
+        # across lines still counts as a leak.
+        assert _header_leak(doc_id).search(" ".join(s.own_text.split())) is None, s.id
     assert not any("EMail:" in s.own_text or "Email:" in s.own_text for s in out)
 
 
