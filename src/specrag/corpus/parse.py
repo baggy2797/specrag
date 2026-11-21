@@ -71,6 +71,10 @@ def _parser_for(dialect: Dialect) -> Callable[[str, BeautifulSoup], list[Section
         from specrag.corpus.parse_v3 import parse_v3
 
         return parse_v3
+    if dialect == Dialect.RFC_HTMLIZED:
+        from specrag.corpus.parse_htmlized import parse_htmlized
+
+        return parse_htmlized
     raise NotImplementedError(f"no parser implemented yet for dialect {dialect.value}")
 
 
