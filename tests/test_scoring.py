@@ -33,6 +33,7 @@ def _sec(number: str, own: int) -> Section:
 
 
 def mk(sections: list[str], tokens: list[int]) -> Chunk:
+    n = max(1, sum(tokens))  # span must be non-empty even when tokens are all zero
     return Chunk(
         id="c",
         doc_id=DOC,
@@ -40,7 +41,8 @@ def mk(sections: list[str], tokens: list[int]) -> Chunk:
         index_text="t",
         sections=sections,
         tokens=tokens,
-        n_tokens=sum(tokens),
+        n_tokens=n,
+        span=(0, n),
     )
 
 

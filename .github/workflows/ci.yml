@@ -73,6 +73,8 @@ jobs:
           echo "::error title=Infrastructure failure, not a test failure::corpus unavailable: not caused by this change"
           echo "corpus unavailable: not caused by this change (infrastructure failure, not a test failure)" >> "$GITHUB_STEP_SUMMARY"
           exit 3
+      - name: Parse corpus (always, so sections match this commit)
+        run: uv run specrag parse
       - name: Tests with coverage (no corpus skips allowed)
         run: |
           set -o pipefail

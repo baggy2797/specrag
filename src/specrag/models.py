@@ -50,12 +50,21 @@ class Chunk(BaseModel):
     index_text: str
     sections: list[str]
     tokens: list[int]
-    n_tokens: int
+    n_tokens: int  # whole-chunk size: prefix_tokens + (span[1] - span[0]); not the budget cost
+    span: tuple[int, int]  # body token offsets [start, end) in the doc stream
+    prefix_tokens: int = 0
 
     @model_validator(mode="after")
     def _check_parallel(self) -> Self:
         if len(self.sections) < 1 or len(self.sections) != len(self.tokens):
             raise ValueError("sections and tokens must be the same length and non-empty")
+        start, end = self.span
+        if not 0 <= start < end:
+            raise ValueError("span must satisfy 0 <= start < end")
+        if self.n_tokens != self.prefix_tokens + (end - start):
+            raise ValueError("n_tokens must equal prefix_tokens + span length")
+        if sum(self.tokens) > end - start:
+            raise ValueError("sum(tokens) must not exceed the span length")
         return self
 
 
