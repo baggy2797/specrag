@@ -6,3 +6,5 @@ corpus/raw/
 results/traces/
 .DS_Store
 .env
+.superpowers/
+.tiktoken-cache/
