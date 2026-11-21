@@ -40,7 +40,7 @@ def test_ids_titles_nesting(secs: dict[str, Section]) -> None:
 
 
 def test_own_text_excludes_children_and_joins_lists(secs: dict[str, Section]) -> None:
-    assert secs["d#3"].own_text == "Main text. first item second item"
+    assert secs["d#3"].own_text == "Main text.\n\n- first item\n\n- second item"
     assert secs["d#3.1"].own_text == "Sub text."
     assert secs["d#1"].own_tokens > 0
 

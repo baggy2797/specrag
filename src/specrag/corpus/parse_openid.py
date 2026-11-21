@@ -13,9 +13,10 @@ raises ParseError so content loss is never silent.
 
 import re
 
-from bs4 import BeautifulSoup, Tag
+from bs4 import BeautifulSoup
 from bs4.element import NavigableString
 
+from specrag.corpus.layout import finalize, html_units, join_units
 from specrag.corpus.parse import ParseError, flag_references, is_references_title
 from specrag.models import Section
 from specrag.sections import make_id, parent
@@ -32,23 +33,6 @@ _NUMBERED_TEXT = re.compile(
 _AUTHORS = re.compile(r"^Authors?['\u2019]s? Address(?:es)?$")
 _MAX_DROP_TOKENS = 50
 _NUM_PREFIX = re.compile(r"^\s*(?:Appendix\s+)?\S+?\.?\xa0\s*")
-_BLOCKS = [
-    "p",
-    "li",
-    "ul",
-    "ol",
-    "blockquote",
-    "pre",
-    "table",
-    "tr",
-    "td",
-    "th",
-    "br",
-    "div",
-    "dd",
-    "dt",
-    "dl",
-]
 
 
 def parse_openid(doc_id: str, soup: BeautifulSoup) -> list[Section]:
@@ -80,17 +64,13 @@ def parse_openid(doc_id: str, soup: BeautifulSoup) -> list[Section]:
             h.replace_with(NavigableString(_STOP.format(len(stops))))
             stops.append(_WS.sub(" ", h.get_text().replace("\xa0", " ")).strip())
 
-    for tag in soup.find_all(_BLOCKS):
-        assert isinstance(tag, Tag)
-        tag.insert_after(NavigableString(" "))
-        tag.insert_before(NavigableString(" "))
-
-    parts = _SPLIT_RE.split((soup.body or soup).get_text())
+    # Headings are now marker strings; the walker keeps each marker a unit of its own.
+    parts = _SPLIT_RE.split(join_units(html_units(soup.body or soup)))
     # re.split with two groups: [front, kind, idx, body, kind, idx, body, ...]
     out: list[Section] = []
     for i in range(1, len(parts), 3):
         kind, idx, body = parts[i], int(parts[i + 1]), parts[i + 2]
-        own = _WS.sub(" ", body.replace("\xa0", " ")).strip()
+        own = finalize(body)
         if kind == "S":
             heading = stops[idx]
             front_matter = not out
