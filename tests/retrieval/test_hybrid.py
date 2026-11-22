@@ -27,3 +27,10 @@ def test_rrf_empty_and_n_and_k() -> None:
     assert rrf([]) == []
     assert len(rrf([[("A", 1.0), ("B", 0.5), ("C", 0.1)]], n=2)) == 2
     assert dict(rrf([[("A", 1.0)]], k=10))["A"] == pytest.approx(1 / 11)
+
+
+def test_rrf_rejects_duplicate_ids_within_a_ranking() -> None:
+    with pytest.raises(ValueError, match="duplicate"):
+        rrf([[("A", 1.0), ("B", 0.5), ("A", 0.1)]])
+    # the same ID across different rankings is the point of fusion
+    assert rrf([[("A", 1.0)], [("A", 1.0)]])[0][0] == "A"

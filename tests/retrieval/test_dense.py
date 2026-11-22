@@ -258,3 +258,31 @@ def test_real_model_normalised() -> None:
     q = emb.embed(["what is pkce"], query=True)
     np.testing.assert_allclose(np.linalg.norm(q, axis=1), 1.0, atol=1e-5)
     assert emb.truncated(["short", "word " * 2000]) == 1
+
+
+def _stored(tmp_path: Path) -> tuple[Path, Path]:
+    build(CHUNKS, FakeEmbedder(), tmp_path)
+    (npy,) = tmp_path.glob("emb-*.npy")
+    return npy, npy.with_suffix(".json")
+
+
+@pytest.mark.parametrize("bad", ["rows", "nan", "inf", "zero_dim", "dim"])
+def test_cache_with_bad_matrix_rebuilds(tmp_path: Path, bad: str) -> None:
+    npy, _ = _stored(tmp_path)
+    m = np.load(npy)
+    if bad == "rows":
+        m = m[:2]
+    elif bad == "nan":
+        m[1, 3] = np.nan
+    elif bad == "inf":
+        m[0, 0] = np.inf
+    elif bad == "zero_dim":
+        m = np.zeros((3, 0), dtype=np.float32)
+    else:
+        m = m[:, : DIM // 2]  # dim differs from what the embedder produces
+    np.save(npy, m, allow_pickle=False)
+    emb = FakeEmbedder()
+    idx = build(CHUNKS, emb, tmp_path)
+    assert len(emb.calls) == 1
+    assert idx.matrix.shape == (3, DIM)
+    assert np.isfinite(idx.matrix).all()
