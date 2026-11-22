@@ -36,6 +36,7 @@ markers = [
     "corpus: needs fetched corpus",
     "model: needs the dense model",
     "reranker: needs the reranker model",
+    "real_preflight: runs the real corpus pre-flight (no stub)",
 ]
 
 [tool.ruff]

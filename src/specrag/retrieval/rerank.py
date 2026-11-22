@@ -3,7 +3,7 @@
 from typing import Any, Protocol
 
 from specrag.models import Chunk
-from specrag.retrieval.models_pin import RERANK_MODEL, RERANK_REVISION
+from specrag.retrieval.models_pin import RERANK_MODEL, RERANK_REVISION, resolve_pinned
 
 RERANK_DEPTH = 50
 MAX_LENGTH = 512
@@ -24,9 +24,13 @@ class CrossEncoderReranker:
             from sentence_transformers import CrossEncoder
 
             self._model = CrossEncoder(
-                RERANK_MODEL, revision=RERANK_REVISION, device="cpu", max_length=MAX_LENGTH
+                resolve_pinned(RERANK_MODEL, RERANK_REVISION), device="cpu", max_length=MAX_LENGTH
             )
         return self._model
+
+    def warm_up(self) -> None:
+        """Load the model now (downloads on first use)."""
+        self._get()
 
     def score(self, query: str, texts: list[str]) -> list[float]:
         if not texts:

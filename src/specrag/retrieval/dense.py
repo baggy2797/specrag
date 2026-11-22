@@ -11,7 +11,7 @@ import numpy as np
 
 from specrag.models import Chunk
 from specrag.retrieval.chunkers import CHUNKER_VERSION, ChunkerName
-from specrag.retrieval.models_pin import DENSE_MODEL, DENSE_REVISION
+from specrag.retrieval.models_pin import DENSE_MODEL, DENSE_REVISION, resolve_pinned
 from specrag.retrieval.ranking import sort_ranking
 
 QUERY_INSTRUCTION = "Represent this sentence for searching relevant passages: "
@@ -53,9 +53,15 @@ class SentenceTransformerEmbedder:
         if self._model is None:
             from sentence_transformers import SentenceTransformer
 
-            self._model = SentenceTransformer(DENSE_MODEL, revision=DENSE_REVISION, device="cpu")
+            self._model = SentenceTransformer(
+                resolve_pinned(DENSE_MODEL, DENSE_REVISION), device="cpu"
+            )
         self._model.max_seq_length = self.max_seq_tokens
         return self._model
+
+    def warm_up(self) -> None:
+        """Load the model now (downloads on first use)."""
+        self._get()
 
     def embed(self, texts: list[str], *, query: bool) -> np.ndarray:
         model = self._get()
