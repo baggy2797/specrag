@@ -196,3 +196,41 @@ def test_search_bm25_section_end_to_end() -> None:
     r = CliRunner().invoke(app, ["search", "PKCE code_verifier", "--retriever", "bm25"])
     assert r.exit_code == 0, r.output
     assert "tokens used: 2500" in r.output
+
+
+def test_cli_search_shadowed_model_dir_exits_3(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    _patch(monkeypatch, [], [])
+    (tmp_path / "BAAI" / "bge-small-en-v1.5").mkdir(parents=True)
+    monkeypatch.chdir(tmp_path)  # the real embedder is used: resolve_pinned fails closed
+    r = CliRunner().invoke(app, ["search", "x", "--retriever", "dense"])
+    assert r.exit_code == 3
+    assert "model unavailable: BAAI/bge-small-en-v1.5@5c38ec7c" in r.output
+    assert "(local path shadows pinned model id)" in r.output
+
+
+@pytest.mark.corpus
+def test_search_json_is_byte_identical_across_hash_seeds() -> None:
+    import os
+    import subprocess
+
+    outs = []
+    for seed in ("1", "2"):
+        r = subprocess.run(
+            [
+                "uv",
+                "run",
+                "specrag",
+                "search",
+                "PKCE code_verifier code_challenge S256",
+                "--retriever",
+                "bm25",
+                "--json",
+            ],
+            env={**os.environ, "PYTHONHASHSEED": seed},
+            capture_output=True,
+            check=True,
+        )
+        outs.append(r.stdout)
+    assert outs[0] and outs[0] == outs[1]

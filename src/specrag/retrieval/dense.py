@@ -116,9 +116,12 @@ def _load_cache(npy: Path, ids: list[str], hashes: list[str]) -> tuple[np.ndarra
             return None
         matrix = np.load(npy, allow_pickle=False)
         truncated = int(meta["truncated"])
+        dim = int(meta["dim"])
     except (OSError, ValueError, KeyError, TypeError):
         return None
-    if matrix.dtype != np.float32 or matrix.ndim != 2 or matrix.shape[0] != len(ids):
+    if matrix.dtype != np.float32 or matrix.ndim != 2 or matrix.shape != (len(ids), dim):
+        return None
+    if dim <= 0 or not np.isfinite(matrix).all():
         return None
     return matrix, truncated
 
@@ -128,7 +131,7 @@ def _store_cache(
 ) -> None:
     npy.parent.mkdir(parents=True, exist_ok=True)
     _atomic_write(npy, lambda f: np.save(f, matrix, allow_pickle=False))
-    meta = {"ids": ids, "sha256": hashes, "truncated": truncated}
+    meta = {"ids": ids, "sha256": hashes, "truncated": truncated, "dim": int(matrix.shape[1])}
     _atomic_write(_sidecar(npy), lambda f: f.write(json.dumps(meta).encode("utf-8")))
 
 

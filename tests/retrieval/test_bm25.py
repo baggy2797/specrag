@@ -93,3 +93,54 @@ def test_bm25_pkce_smoke() -> None:
     by_id = {c.id: c for c in chunks}
     wanted = {"rfc7636#4.1", "rfc7636#4.2"}
     assert any(wanted & set(by_id[cid].sections) for cid, _ in top), top
+
+
+_SEED_SCRIPT = """
+import sys
+from specrag.models import Chunk
+from specrag.retrieval.bm25 import BM25Index
+
+def mk(i):
+    words = [f"w{(i * 7 + j * 3) % 23}" for j in range(40)]
+    text = " ".join(words)
+    return Chunk(id=f"c{i:03d}", doc_id="d", text=text, index_text=text,
+                 sections=["d#1"], tokens=[40], n_tokens=40, span=(0, 40))
+
+idx = BM25Index.build([mk(i) for i in range(60)])
+q = " ".join(f"w{k}" for k in range(23))
+print([(cid, repr(s)) for cid, s in idx.rank(q)])
+"""
+
+
+def test_bm25_rank_is_hash_seed_independent() -> None:
+    import os
+    import subprocess
+    import sys
+
+    outs = set()
+    for seed in ("1", "2", "3", "4", "5"):
+        env = {**os.environ, "PYTHONHASHSEED": seed}
+        r = subprocess.run(
+            [sys.executable, "-c", _SEED_SCRIPT],
+            env=env,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        outs.add(r.stdout)
+    assert len(outs) == 1
+
+
+def test_bm25_sums_terms_in_sorted_order() -> None:
+    chunks = [mk(f"c{i}", " ".join(f"t{(i + j) % 9}" for j in range(5))) for i in range(12)]
+    idx = BM25Index.build(chunks)
+    query = "t8 t1 t5 t0 t3 t7 t2 t6 t4"
+    expected: dict[str, float] = {}
+    for term in sorted(set(tokenize(query))):
+        posting = idx.postings[term]
+        df = len(posting)
+        idf = math.log(1 + (idx.n_docs - df + 0.5) / (df + 0.5))
+        for cid, tf in posting:
+            norm = idx.k1 * (1 - idx.b + idx.b * idx.doc_len[cid] / idx.avgdl)
+            expected[cid] = expected.get(cid, 0.0) + idf * tf * (idx.k1 + 1) / (tf + norm)
+    assert dict(idx.rank(query)) == expected

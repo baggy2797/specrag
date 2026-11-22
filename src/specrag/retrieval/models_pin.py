@@ -10,6 +10,10 @@ RERANK_REVISION = "2cfc18c9415c912f9d8155881c133215df768a70"
 ALLOW_PATTERNS = ["*.json", "*.txt", "*.model", "*.safetensors"]
 
 
+class ShadowedModelError(ValueError):
+    """A local path would shadow the pinned model id (CWE-426)."""
+
+
 def resolve_pinned(model_id: str, revision: str) -> str:
     """Absolute snapshot path of the pinned revision (CWE-426).
 
@@ -19,8 +23,10 @@ def resolve_pinned(model_id: str, revision: str) -> str:
     """
     import os
 
-    if os.path.exists(model_id):
-        raise ValueError(f"local path shadows pinned model id: {model_id}")
+    # Absolute and explicit-relative IDs can never be Hub IDs; a bare "org/name" is also a local
+    # path if it exists relative to the cwd (that is how SentenceTransformer would resolve it).
+    if os.path.isabs(model_id) or model_id.startswith((".", "~")) or os.path.exists(model_id):
+        raise ShadowedModelError(f"local path shadows pinned model id: {model_id}")
     from huggingface_hub import snapshot_download
 
     return str(snapshot_download(model_id, revision=revision, allow_patterns=ALLOW_PATTERNS))

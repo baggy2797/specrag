@@ -262,3 +262,10 @@ def test_pack_truncation_of_only_separators_skipped() -> None:
     p = pack([first, whole], streams, budget=11)
     assert [c.id for c in p.chunks] == [first.id]
     assert p.tokens_used == 10
+
+
+def test_pack_budget_zero_packs_nothing() -> None:
+    streams, _, ch = setup({"a#1": 300})
+    p = pack([ch["a#1"][0]], streams, budget=0)
+    assert p == Packed(chunks=[], costs=[], tokens_used=0, exhausted=False)
+    assert pack([], {}, budget=0).tokens_used == 0

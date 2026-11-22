@@ -45,7 +45,8 @@ class BM25Index:
 
     def rank(self, query: str, n: int = 1000) -> list[tuple[str, float]]:
         scores: dict[str, float] = {}
-        for term in set(tokenize(query)):
+        # sorted: float summation order must not depend on PYTHONHASHSEED
+        for term in sorted(set(tokenize(query))):
             posting = self.postings.get(term)
             if not posting:
                 continue

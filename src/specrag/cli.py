@@ -19,6 +19,7 @@ from specrag.retrieval.models_pin import (
     DENSE_REVISION,
     RERANK_MODEL,
     RERANK_REVISION,
+    ShadowedModelError,
 )
 from specrag.retrieval.pipeline import RetrievalConfig, Retriever
 from specrag.retrieval.rerank import CrossEncoderReranker
@@ -166,6 +167,12 @@ def _warm(model: _Warmable, model_id: str, revision: str) -> None:
     typer.echo(_LOADING.format(id=model_id), err=True)
     try:
         model.warm_up()
+    except ShadowedModelError as e:
+        typer.echo(
+            f"model unavailable: {model_id}@{revision} (local path shadows pinned model id)",
+            err=True,
+        )
+        raise typer.Exit(3) from e
     except (LocalEntryNotFoundError, HfHubHTTPError, OSError) as e:
         typer.echo(
             f"model unavailable: {model_id}@{revision} — "

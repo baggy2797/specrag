@@ -9,6 +9,10 @@ def rrf(
     """Fuse rankings: score = sum of 1/(k + rank), rank starting at 1; absent IDs add 0."""
     scores: dict[str, float] = {}
     for ranking in rankings:
+        ids = [cid for cid, _ in ranking]
+        if len(set(ids)) != len(ids):
+            dupes = sorted({c for c in ids if ids.count(c) > 1})
+            raise ValueError(f"duplicate IDs within one ranking: {dupes}")
         for rank, (cid, _) in enumerate(ranking, start=1):
             scores[cid] = scores.get(cid, 0.0) + 1.0 / (k + rank)
     return sort_ranking(scores)[:n]
