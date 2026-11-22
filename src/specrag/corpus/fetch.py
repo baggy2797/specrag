@@ -17,8 +17,10 @@ from specrag.corpus.manifest import ManifestEntry, corpus_cache_dir, raw_path, w
 MAX_BYTES = 20 * 1024 * 1024
 
 
-_SCRIPT_BLOCK = re.compile(rb"<script[^>]*>.*?</script>", re.DOTALL | re.IGNORECASE)
 _CF_MARKER = b"__CF$cv$params"
+_OPEN_TAG = re.compile(rb"<script(?:[\s/][^<>]{0,2048})?>", re.IGNORECASE)
+# Alternation order matters: a well-formed closer wins over a bare ``</script``.
+_TOKEN = re.compile(rb"<script|</script\s{0,32}>|</script|" + re.escape(_CF_MARKER), re.IGNORECASE)
 
 
 def normalize(data: bytes) -> bytes:
@@ -27,15 +29,46 @@ def normalize(data: bytes) -> bytes:
     Cloudflare inserts a per-request ``<script>`` block containing
     ``window.__CF$cv$params={r:'<random>',t:'<ts>'}`` into some pages, so the
     same document hashes differently on every fetch. Hashing and storing the
-    bytes with that block removed makes the pin stable. Only ``<script>``
-    blocks containing the ``__CF$cv$params`` marker are removed; every other
-    byte, including ordinary scripts, is left untouched.
+    bytes with that block removed makes the pin stable. Removal is anchored on
+    the ``__CF$cv$params`` marker: a block is cut only when a well-formed
+    ``<script ...>`` opening tag, the marker and a ``</script>`` closer occur in
+    that order with no other script tag boundary between them. Otherwise the
+    data is left unchanged. Every other byte, including ordinary scripts, is
+    untouched. A ``<script`` seen while a block is open (an unterminated earlier
+    tag, or one inside a string) restarts the block, so for
+    ``<script>var s='<script>';MARK</script>`` the outer prefix
+    ``<script>var s='`` is kept and only the inner block is removed. A single
+    forward pass over the tokens, so linear time.
     """
-
-    def _drop(m: re.Match[bytes]) -> bytes:
-        return b"" if _CF_MARKER in m.group(0) else m.group(0)
-
-    return _SCRIPT_BLOCK.sub(_drop, data)
+    out: list[bytes] = []
+    pos = 0
+    open_start = -1  # start of the current ``<script`` candidate, or -1
+    open_end = -1  # end of its validated open tag, or -1 if not yet validated
+    seen = False  # marker seen inside the current block
+    for m in _TOKEN.finditer(data):
+        tok = m.group(0)
+        if tok == _CF_MARKER:
+            if open_start < 0 or seen:
+                continue
+            if open_end < 0:  # validate the open tag lazily, once per block
+                tag = _OPEN_TAG.match(data, open_start)
+                if tag is None:
+                    open_start = -1
+                    continue
+                open_end = tag.end()
+            seen = m.start() >= open_end
+        elif tok[:2] == b"</":
+            if seen and tok.endswith(b">"):
+                out.append(data[pos:open_start])
+                pos = m.end()
+            open_start, open_end, seen = -1, -1, False
+        else:
+            # Any new ``<script`` (including an unterminated earlier one) restarts.
+            open_start, open_end, seen = m.start(), -1, False
+    if not out:
+        return data
+    out.append(data[pos:])
+    return b"".join(out)
 
 
 class FetchError(Exception):

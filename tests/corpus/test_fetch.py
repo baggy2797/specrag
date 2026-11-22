@@ -1,4 +1,5 @@
 import hashlib
+import time
 from pathlib import Path
 
 import httpx
@@ -239,6 +240,109 @@ def test_normalize_keeps_ordinary_script() -> None:
     assert (
         normalize(data) == b"<html><script>var x = 1;</script><script src='a.js'></script></html>"
     )
+
+
+@pytest.mark.parametrize("end", [b"</script >", b"</SCRIPT>", b"</script\n>"])
+def test_normalize_end_tag_variants(end: bytes) -> None:
+    beacon = b"<SCRIPT type='x'>window.__CF$cv$params={r:'a'};" + end
+    assert normalize(_page(beacon)) == b"<html><body>spec</body></html>"
+
+
+def test_normalize_does_not_widen_over_ordinary_script() -> None:
+    ordinary = b"<script>var a = 1;</script><p>keep</p>"
+    assert normalize(ordinary + _beacon("z")) == ordinary
+
+
+def test_normalize_unterminated_script_does_not_widen() -> None:
+    data = b"<p>a</p><script <b>text</b>" + _beacon("z") + b"<p>b</p>"
+    assert normalize(data) == b"<p>a</p><script <b>text</b><p>b</p>"
+
+
+def test_normalize_unterminated_script_inside_open_tag_is_unchanged() -> None:
+    data = b"<script var x = '__CF$cv$params';</script><p>b</p>"
+    assert normalize(data) == data
+
+
+def test_normalize_marker_outside_script_unchanged() -> None:
+    data = b"<p>__CF$cv$params</p><script>ok()</script>"
+    assert normalize(data) == data
+
+
+def test_normalize_marker_without_closer_unchanged() -> None:
+    data = b"<script>window.__CF$cv$params={r:'a'}"
+    assert normalize(data) == data
+
+
+def test_normalize_marker_between_closed_scripts_unchanged() -> None:
+    data = b"<script>a()</script>__CF$cv$params<script>b()</script>"
+    assert normalize(data) == data
+
+
+def test_normalize_pathological_input_is_fast() -> None:
+    data = b"<script " * (5 * 1024 * 1024 // 8)
+    start = time.perf_counter()
+    assert normalize(data) == data
+    assert time.perf_counter() - start < 2.0
+
+
+_N_MARKERS = 1_000_000
+_MARKER = b"__CF$cv$params"
+
+
+@pytest.mark.parametrize(
+    "data",
+    [
+        pytest.param(_MARKER * _N_MARKERS, id="markers-no-scripts"),
+        pytest.param(b"<script " + _MARKER * _N_MARKERS, id="markers-in-unterminated-script"),
+        pytest.param(b"<script>x" + b"</script " + _MARKER * _N_MARKERS, id="bad-closer"),
+        pytest.param(b"<script>x</script>" + _MARKER * _N_MARKERS, id="closed-script-before"),
+        pytest.param(
+            b"<script>" + b"</script" + b" " * 1_000_000 + _MARKER * _N_MARKERS,
+            id="closer-long-whitespace",
+        ),
+    ],
+)
+def test_normalize_many_markers_unchanged_and_fast(data: bytes) -> None:
+    start = time.perf_counter()
+    assert normalize(data) == data
+    assert time.perf_counter() - start < 3.0
+
+
+def test_normalize_many_valid_beacons_fast() -> None:
+    block = b"<script>window." + _MARKER + b"={r:'a'};</script>"
+    data = (b"<p>x</p>" + block) * (_N_MARKERS // 4)
+    start = time.perf_counter()
+    assert normalize(data) == b"<p>x</p>" * (_N_MARKERS // 4)
+    assert time.perf_counter() - start < 3.0
+
+
+@pytest.mark.parametrize("tag", [b"<scripts>", b"<scriptx>", b"<script-x>"])
+def test_normalize_script_prefix_tags_do_not_open_block(tag: bytes) -> None:
+    data = tag + b"window.__CF$cv$params={};</script><p>k</p>"
+    assert normalize(data) == data
+
+
+def test_normalize_open_tag_attribute_cap() -> None:
+    body = b"window.__CF$cv$params={};</script>"
+    within = b"<script data-x='" + b"a" * 2000 + b"'>" + body
+    beyond = b"<script data-x='" + b"a" * 3000 + b"'>" + body
+    assert normalize(within) == b""
+    assert normalize(beyond) == beyond
+
+
+def test_normalize_marker_inside_open_tag_unchanged() -> None:
+    data = b"<script data-x='__CF$cv$params'>ok()</script><p>k</p>"
+    assert normalize(data) == data
+
+
+def test_normalize_bare_closer_without_gt_unchanged() -> None:
+    data = b"<script>window.__CF$cv$params={};</script <p>k</p>"
+    assert normalize(data) == data
+
+
+def test_normalize_nested_open_resets_block() -> None:
+    data = b"<script>var s='<script>';window.__CF$cv$params={};</script><p>k</p>"
+    assert normalize(data) == b"<script>var s='<p>k</p>"
 
 
 def test_beacon_variants_pass_against_one_pin() -> None:
